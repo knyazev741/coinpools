@@ -1,4 +1,5 @@
 import asyncio
+import sqlite3
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -14,60 +15,65 @@ async def fetch_and_process_pools():
     options.add_argument("--headless")  # Запуск в фоновом режиме
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")  # Добавлено
+    options.add_argument("--remote-debugging-port=9222")  # Добавлено
     service = Service(CHROME_DRIVER_PATH)
 
     # Инициализация базы данных
     conn = initialize_db(DB_FILE)
 
-    # Инициализация браузера
-    driver = webdriver.Chrome(service=service, options=options)
-
     while True:
-        # Открытие страницы авторизации
-        driver.get(URL_SILVER)
+        try:
+            # Инициализация браузера
+            driver = webdriver.Chrome(service=service, options=options)
 
-        # Ожидание загрузки страницы
-        time.sleep(5)
+            # Открытие страницы авторизации
+            driver.get(URL_SILVER)
 
-        # Получение HTML-кода страницы
-        html = driver.page_source
+            # Ожидание загрузки страницы
+            time.sleep(5)
 
-        # Парсинг HTML с помощью BeautifulSoup
-        soup = BeautifulSoup(html, 'html.parser')
+            # Получение HTML-кода страницы
+            html = driver.page_source
 
-        # Поиск всех элементов пулов
-        pools = soup.find_all('li', class_='_item_kyzjh_6')
+            # Парсинг HTML с помощью BeautifulSoup
+            soup = BeautifulSoup(html, 'html.parser')
 
-        print(f"Найдено пулов: {len(pools)}")
+            # Поиск всех элементов пулов
+            pools = soup.find_all('li', class_='_item_kyzjh_6')
 
-        for pool in pools:
-            title_element = pool.find('div', class_='_title_1xl6z_82')
-            per_hour_element = pool.find('span', class_='_perHour_1atj8_36')
-            img_element = pool.find('div', class_='_imageContainer_1atj8_22').find('img')
+            print(f"Найдено пулов: {len(pools)}")
 
-            if title_element and per_hour_element and img_element:
-                title = title_element.text.strip()
-                per_hour = per_hour_element.text.strip()
-                img_src = img_element['src']
+            for pool in pools:
+                title_element = pool.find('div', class_='_title_1xl6z_82')
+                per_hour_element = pool.find('span', class_='_perHour_1atj8_36')
+                img_element = pool.find('div', class_='_imageContainer_1atj8_22').find('img')
 
-                if not select_pool_by_title(conn, title):
-                    pool_data = (title, per_hour, img_src)
-                    insert_pool(conn, pool_data)
-                    await createpost(title, per_hour, img_src)
-                    print(f"Пост про {title} успешно отправлен")
+                if title_element and per_hour_element and img_element:
+                    title = title_element.text.strip()
+                    per_hour = per_hour_element.text.strip()
+                    img_src = img_element['src']
+
+                    if not select_pool_by_title(conn, title):
+                        pool_data = (title, per_hour, img_src)
+                        insert_pool(conn, pool_data)
+                        await createpost(title, per_hour, img_src)
+                    else:
+                        print(f"Pool '{title}' already exists in the database.")
                 else:
-                    continue
-            else:
-                print("Один из элементов не найден:")
-                print(f"Title Element: {title_element}")
-                print(f"Per Hour Element: {per_hour_element}")
-                print(f"Image Element: {img_element}")
+                    print("Один из элементов не найден:")
+                    print(f"Title Element: {title_element}")
+                    print(f"Per Hour Element: {per_hour_element}")
+                    print(f"Image Element: {img_element}")
 
-        # Пауза на 55 секунд
+            # Закрытие браузера
+            driver.quit()
+
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+        # Повторить через минуту
         await asyncio.sleep(55)
-
-    # Закрытие браузера
-    driver.quit()
 
     # Закрытие соединения с базой данных
     conn.close()
