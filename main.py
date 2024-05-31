@@ -54,8 +54,9 @@ async def fetch_and_process_pools():
                     pool_data = (title, per_hour, img_src)
                     insert_pool(conn, pool_data)
                     await createpost(title, per_hour, img_src)
+                    print(f"Пост про {title} успешно отправлен")
                 else:
-                    print(f"Pool '{title}' already exists in the database.")
+                    continue
             else:
                 print("Один из элементов не найден:")
                 print(f"Title Element: {title_element}")
