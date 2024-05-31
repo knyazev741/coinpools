@@ -1,0 +1,4 @@
+beautifulsoup4==4.12.3
+selenium==4.21.0
+python-dotenv==1.0.1
+python-telegram-bot==21.2
