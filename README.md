@@ -16,8 +16,8 @@ NotCoinBot Pool Notifications is a project designed to provide instant notificat
 
 1. **Clone the repository**:
     ```sh
-    git clone <repository-url>
-    cd <repository-directory>
+    git clone https://github.com/knyazev741/coinpools
+    cd coinpools
     ```
 
 2. **Create and activate a virtual environment**:
