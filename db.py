@@ -1,8 +1,10 @@
 import sqlite3
 
+
 def create_connection(db_file):
     conn = sqlite3.connect(db_file)
     return conn
+
 
 def create_table(conn):
     sql_create_pools_table = """
@@ -19,6 +21,7 @@ def create_table(conn):
     except sqlite3.Error as e:
         print(e)
 
+
 def insert_pool(conn, pool):
     sql = ''' INSERT INTO pools(title, per_hour, img_src)
               VALUES(?,?,?) '''
@@ -27,14 +30,15 @@ def insert_pool(conn, pool):
     conn.commit()
     return cur.lastrowid
 
+
 def select_pool_by_title(conn, title):
     cur = conn.cursor()
     cur.execute("SELECT * FROM pools WHERE title=?", (title,))
     rows = cur.fetchall()
     return rows
 
+
 def initialize_db(db_file):
     conn = create_connection(db_file)
     create_table(conn)
     return conn
-
