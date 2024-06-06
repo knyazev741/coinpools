@@ -37,7 +37,9 @@ async def createpost(title, per_hour, img_src):
 
         # Calculate earnings for each level
         def format_earnings(earnings):
-            return f"{earnings:.2f}".rstrip('0').rstrip('.') if '.' in f"{earnings:.2f}" else f"{earnings}"
+            if earnings.is_integer():
+                return f"{int(earnings)}"
+            return f"{earnings}"
 
         bronze_earnings = format_earnings(base_earnings * multipliers["Bronze"])
         silver_earnings = format_earnings(base_earnings * multipliers["Silver"])
