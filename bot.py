@@ -48,15 +48,18 @@ async def createpost(title, per_hour, img_src):
 
         message = (
             f"*New pool available*: {title}\n\n"
-            f"*$NOT per hour*\n"
-            f"Platinum: {platinum_earnings}\n"
-            f"Gold: {gold_earnings}\n"
-            f"Silver: {silver_earnings}\n"
-            f"Bronze: {bronze_earnings}\n\n"
-            f"*Earn now in* @notcoin\\_bot"
+            f"*$NOT per hour:*\n\n"
+            f"▪ Platinum: {platinum_earnings}\n"
+            f"▪ Gold: {gold_earnings}\n"
+            f"▪ Silver: {silver_earnings}\n"
+            f"▪ Bronze: {bronze_earnings}\n\n"
+            f"*Earn now 👉* @notcoin\\_bot\n\n"
+            f"Creator's blog: [EN](https://t.me/digital_man_blog) | [RU](https://t.me/digital_man)\n\n"
+            f"[Subscribe to Notcoin Pools](https://t.me/coinpools)"
         )
 
-        await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode='Markdown')
+        await bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode='Markdown',
+                               disable_web_page_preview=True)
 
     except Exception as e:
         await send_error_to_admin(str(e))

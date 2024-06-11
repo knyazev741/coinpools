@@ -38,6 +38,7 @@ def select_pool_by_title(conn, title):
     return rows
 
 
+
 def initialize_db(db_file):
     conn = create_connection(db_file)
     create_table(conn)
