@@ -2,3 +2,5 @@
 /.env
 /pools.db
 /nohup.out
+/community_main.py
+/json_main.py

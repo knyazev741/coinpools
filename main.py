@@ -12,7 +12,6 @@ from bot import createpost, close_bot, send_error_to_admin
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
 async def fetch_and_process_pools():
     # Configure Selenium
     options = Options()
@@ -27,6 +26,7 @@ async def fetch_and_process_pools():
     conn = initialize_db(DB_FILE)
 
     while True:
+        driver = None
         try:
             # Initialize the browser
             driver = webdriver.Chrome(service=service, options=options)
@@ -70,19 +70,19 @@ async def fetch_and_process_pools():
                     logger.warning(f"Per Hour Element: {per_hour_element}")
                     logger.warning(f"Image Element: {img_element}")
 
-            # Close the browser
-            driver.quit()
-
         except Exception as e:
             logger.error(f"Error: {e}")
             await send_error_to_admin(str(e))
+
+        finally:
+            if driver:
+                driver.quit()
 
         # Repeat after a minute
         await asyncio.sleep(55)
 
     # Close the database connection
     conn.close()
-
 
 async def main():
     try:
